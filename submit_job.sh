@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:v100:1
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=47G
@@ -13,6 +13,6 @@ echo "starting training"
 module load python/3.6
 module load scipy-stack
 source env_setup.sh
-python train_conditional.py
+python -u train_conditional.py -e 3
 
 #nvidia-smi

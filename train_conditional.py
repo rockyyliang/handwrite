@@ -37,7 +37,7 @@ def main():
     model = WRITER_COND(vocab_dim=65, device=DEVICE).double()
     model.to(DEVICE)
     opt = torch.optim.RMSprop(model.parameters(), lr=1.0e-3)
-    lr_plateau = torch.optim.lr_scheduler.ReduceLROnPlateau(opt, factor=0.5, patience=20, cooldown=10, min_lr=1e-6)
+    lr_plateau = torch.optim.lr_scheduler.ReduceLROnPlateau(opt, factor=0.5, patience=10, cooldown=5, min_lr=1e-6)
 
     '''create directory for saving weights'''
     weights_path = './weights'
