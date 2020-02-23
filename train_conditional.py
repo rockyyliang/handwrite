@@ -43,7 +43,7 @@ def main():
     weights_path = './weights'
     if not os.path.exists(weights_path):
         os.mkdir(weights_path)
-    save_path = os.path.join(weights_path,date_string('_cond'))
+    save_path = os.path.join(weights_path,date_string('cond'))
     os.mkdir(save_path)
     print('saving weights to', save_path)
 
@@ -126,8 +126,8 @@ def main():
 
                     lr_history.append(opt.param_groups[0]['lr'])
 
-                    if(b>=510):
-                        break
+                    #if(b>=510):
+                        #break
 
         total_time = time.time()-start
         print('Training time: {:.2f}'.format(total_time))
