@@ -1,5 +1,8 @@
-from datetime import datetime
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+
+from datetime import datetime
 
 def save_train_history(train, val, figname, val_freq):
     train_line, = plt.plot(train, label='Training Loss')

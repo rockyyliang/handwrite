@@ -1,8 +1,12 @@
+#fix for plotting error
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
 import numpy as np
 import os
 import time
 import argparse
-import matplotlib.pyplot as plt
 
 import torch
 from torch.utils.data import DataLoader
