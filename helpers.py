@@ -7,6 +7,7 @@ def save_train_history(train, val, figname, val_freq):
     plt.xlabel(' x {} Batches'.format(val_freq))
     plt.ylabel('Loss')
     plt.legend()
+    plt.ylim((-2,6))
     plt.savefig(figname)
 
 def date_string(note=None):

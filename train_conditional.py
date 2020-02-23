@@ -126,8 +126,8 @@ def main():
 
                     lr_history.append(opt.param_groups[0]['lr'])
 
-                    #if(b>=510):
-                        #break
+                    if(b>=510):
+                        break
 
         total_time = time.time()-start
         print('Training time: {:.2f}'.format(total_time))
