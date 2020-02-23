@@ -55,8 +55,8 @@ def main():
     train_loss_history = []
     val_loss_history = []
     lr_history = []
-    val_freq = 20
-    save_freq = 500
+    val_freq = 40
+    save_freq = 1000
 
     start = time.time()
     try:

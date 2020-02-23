@@ -192,7 +192,7 @@ def make_encoded_input(string, length=65):
 below are functions used to sample from distribution mixtures
 '''
 
-def sample_mix_gaussian(pi, sigma, mu, return_torch=True):
+def sample_mix_gaussian(pi, sigma, mu, bias=0, return_torch=True):
     '''
     given parameters of gaussian mixture, sample from it
 
@@ -208,10 +208,12 @@ def sample_mix_gaussian(pi, sigma, mu, return_torch=True):
     sigma = sigma.squeeze()
     mu = mu.squeeze()
 
+    pi_adjusted = torch.nn.functional.softmax(torch.log(pi+bias), dim=0)
+
     #convert to np
-    if str(type(pi)) == "<class 'torch.Tensor'>":
+    if str(type(pi_adjusted)) == "<class 'torch.Tensor'>":
         if pi.is_cuda:
-            pi = pi.cpu().detach().numpy()
+            pi_adjusted = pi_adjusted.cpu().detach().numpy()
     if str(type(sigma)) == "<class 'torch.Tensor'>":
         if sigma.is_cuda:
             sigma = sigma.cpu().detach().numpy()
@@ -222,14 +224,14 @@ def sample_mix_gaussian(pi, sigma, mu, return_torch=True):
     n_dist = len(pi)
     dist_idx_range = np.arange(n_dist)
 
+
     #choose which distribution to use based on pi array
-    idx = np.random.choice(dist_idx_range, p=pi)
+    idx = np.random.choice(dist_idx_range, p=pi_adjusted)
 
-
-    #print(sigma[idx])
-    #print(mu[idx])
 
     #sample from chosen mu and sigma
+    #adjust sigma for bias
+    sigma_adjusted = np.exp(np.log(sigma[idx]) - bias)
     sample = np.random.normal(mu[idx], sigma[idx])
     if return_torch:
         return torch.tensor(sample)

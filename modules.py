@@ -195,12 +195,58 @@ class WRITER_COND(nn.Module):
 
         return pos, end, (hidden_0, hidden_1)
 
+    def infer(self, x, text, k_integral=0, hidden_states=(None, None)):
+        '''batch size of one only'''
+        #get sequence length
+        sequence_len = x.shape[1]
+
+        #unpack hidden states
+        hidden_0 = hidden_states[0]
+        hidden_1 = hidden_states[1]
+
+        self.lstm_0.flatten_parameters()
+        lstm_out_0, hidden_0 = self.lstm_0(x, hidden_0)
+        attention_out = torch.exp(self.attention(lstm_out_0)).view(-1, sequence_len, self.n_dist, 3, 1)
+
+        a = attention_out[:,:,:,0]
+        b = attention_out[:,:,:,1]
+        k = attention_out[:,:,:,2]
+
+
+        #accumulate k
+        if str(type(k_integral))=="<type 'int'>":
+            k_use = k.cumsum(dim=1)
+        else:
+            k_use = k_integral + k
+
+        #u = torch.arange(0,self.vocab_dim).view(1,1,-1)
+
+        #weights for encoded chars
+        phi = (torch.exp(-b * (k_use - self.u).pow(2)) * a).sum(-2)
+
+        #multiply chars with weights
+        w = torch.matmul(phi, text)
+        #print(w.shape)
+
+        self.lstm_1.flatten_parameters()
+        lstm_in_1 = torch.cat([x, lstm_out_0, w],dim=-1)
+        #print(lstm_in_1.shape)
+        lstm_out_1, hidden_1 = self.lstm_1(lstm_in_1, hidden_1)
+
+        #get last timestep from lstm_1 and feed to mdn
+        final_timestep = lstm_out_1[:,-1,:]
+        pos = self.mdn_position(final_timestep)
+        end = self.mdn_end(final_timestep)
+
+        return pos, end, k_use, phi, (hidden_0, hidden_1)
+
+
 '''
 below are loss functions
 
 TODO:
 mdn_loss_gaussian is for n amount of independent variables
-Graves paper uses bivariate, try that if time allows
+Graves paper uses bivariate, try that later
 def gaussian_probability_bivariate()
 def mdn_loss_bivariate()
 '''
